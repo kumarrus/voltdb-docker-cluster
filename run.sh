@@ -95,9 +95,10 @@ do
 LINK_ARG="$LINK_ARG --link $l:$l"
 done
 # Start docker
-docker run -d -P -h $NAME $LINK_ARG $DOCKER_ENV -v $VOLTPATH:/opt/voltdb -v $VOLTPATH/DOCKER/$PREFIX/$NAME:/tmp/voltdbroot -v $VOLTPATH/DOCKER/SHARE:/tmp/share -v $VOLTPATH/DOCKER/SHARE/$NAME:/tmp/sharelocal --name $NAME nshi/voltdb-cluster \
+# -l /opt/voltdb/voltdb/license.xml
+docker run -d -P -h $NAME $LINK_ARG $DOCKER_ENV -v $VOLTPATH:/opt/voltdb -v $VOLTPATH/DOCKER/$PREFIX/$NAME:/tmp/voltdbroot -v $VOLTPATH/DOCKER/SHARE:/tmp/share -v $VOLTPATH/DOCKER/SHARE/$NAME:/tmp/sharelocal --name $NAME voltdb-image \
 sh -c "groupadd $GROUP;useradd $USER -m -g $GROUP;chown -R $USER:$GROUP /opt /tmp /home/$USER;
-echo 'export PATH=\$PATH:/opt/voltdb/bin;cd /tmp/voltdbroot;voltdb $VOLT_ACTION $CATALOG_OPTION -H $LEADER_NAME -l /opt/voltdb/voltdb/license.xml -d /opt/voltdb/$DEPLOY $VOLT_ARGS' | su - $USER;"
+echo 'export PATH=\$PATH:/opt/voltdb/bin;cd /tmp/voltdbroot;voltdb $VOLT_ACTION $CATALOG_OPTION -H $LEADER_NAME -d /opt/voltdb/$DEPLOY $VOLT_ARGS' | su - $USER;"
 echo
 echo "IP of $NAME:" `docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker ps -a | grep -e "\s$NAME" | awk '{ print $1 }')`
 echo "Ports:" `docker port "$NAME" 21212` "(client)" `docker port "$NAME" 8080` "(HTTP)"
